@@ -1,76 +1,47 @@
-#ASCII
+from PIL import Image, ImageDraw, ImageFont
 
-from PIL import Image, ImageDraw , ImageFont
-import math
+CHARS = "$@B%8&WM#*oahkbUYXzcvunxrjft?-_+~<>i!lI;:,\"^`'. "
+CHAR_ARRAY = list(CHARS)
+CHAR_LENGTH = len(CHAR_ARRAY)
+SCALE_FACTOR = 0.4
+CHAR_WIDTH = 8
+CHAR_HEIGHT = 18
+CHAR_ASPECT_RATIO = CHAR_WIDTH / CHAR_HEIGHT
 
-
-#chars = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/|()1{}[]?-_+~<>i!lI;:,\"^`'. "
-chars = "$@B%8&WM#*oahkbUYXzcvunxrjft?-_+~<>i!lI;:,\"^`'. "
-#chars = " .:;+*#%@"
-charArray = list(chars)
-charLength = len(charArray)
-interval =  charLength/256
-
-
-
-scaleFactor = 0.4
-onecharWidth = 8
-onecharHeight = 18
-char_aspect_ratio = onecharWidth/onecharHeight
-
-
-def getchar(inputint):
-    return charArray[math.floor(inputint*interval)]
+def get_char(brightness):
+    index = int(brightness * CHAR_LENGTH / 256)
+    return CHAR_ARRAY[index]
 
 while True:
     try:
-        file_name = input("What is the File? (e.g., nemo.webp)").strip().lower()
-        im = Image.open(file_name).convert("RGBA")
+        file_name = input("What is the file? (e.g., nemo.webp): ").strip()
+        image = Image.open(file_name).convert("RGBA")
         break
     except FileNotFoundError:
-        print("file not found")
-        continue
-#tesst
+        print("File not found. Try again.")
 
+font = ImageFont.truetype("arial.ttf", 20)
+width, height = image.size
+print("Original size:", width, height)
+new_width = int(SCALE_FACTOR * width)
+new_height = int(SCALE_FACTOR * height * CHAR_ASPECT_RATIO)
+image = image.resize((new_width, new_height))
+width, height = image.size
+print("ASCII size:", width, height)
 
-text_file = open("output.txt", "w")
+pixels = image.load()
+output_image = Image.new("RGBA", (CHAR_WIDTH * width, CHAR_HEIGHT * height), color=(0, 0, 0, 255))
+draw = ImageDraw.Draw(output_image)
 
-fnt = ImageFont.truetype("arial.ttf", 20)
+with open("output.txt", "w") as text_file:
+    for y in range(height):
+        for x in range(width):
+            red, green, blue, alpha = pixels[x, y]
+            brightness = int((red + green + blue) / 3)
+            character = get_char(brightness)
+            text_file.write(character)
+            draw.text((x * CHAR_WIDTH, y * CHAR_HEIGHT), character, font=font, fill=(red, green, blue))
+        text_file.write("\n")
 
-width, height = im.size
-
-print(width,height, height/width )
-new_width = int(scaleFactor * width )
-new_height = int(scaleFactor * height * char_aspect_ratio)
-
-im = im.resize((new_width,new_height))
-twidth, theight = im.size
-pix = im.load()
-
-avg_color_image = im.resize((1,1))
-avg_color = avg_color_image.getpixel((0,0))
-#print(avg_color)
-
-outputImage = Image.new('RGBA', (onecharWidth * twidth, onecharHeight * theight), color = (0,0,0,0))
-print(twidth,theight, theight/twidth)
-
-d = ImageDraw.Draw(outputImage)
-
-#print(im.mode)
-#print(f"This is WxL {width},{height}")
-
-for i in range(theight):
-    for j in range(twidth):
-        r, g, b, A = pix[j, i]
-        #print(r)
-        h = int((r + g + b)/3)
-        pix[j,i] = (h, h, h)
-        text_file.write(getchar(h))
-        d.text((j*onecharWidth, i*onecharHeight), getchar(h), font = fnt, fill = (r,g,b))
-
-    text_file.write('\n')
-text_file.close()
-outputImage.save ("output.png")
-print("Converted!")
-
-
+output_image.save("output.png")
+print("Converted")
