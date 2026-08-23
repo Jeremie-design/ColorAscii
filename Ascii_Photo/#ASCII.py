@@ -1,5 +1,7 @@
+import os
 from PIL import Image, ImageDraw, ImageFont
 
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 CHARS = "$@B%8&WM#*oahkbUYXzcvunxrjft?-_+~<>i!lI;:,\"^`'. "
 CHAR_ARRAY = list(CHARS)
 CHAR_LENGTH = len(CHAR_ARRAY)
@@ -14,13 +16,14 @@ def get_char(brightness):
 
 while True:
     try:
-        file_name = input("What is the file? (e.g., nemo.webp): ").strip()
+        file_name = input("What is the file?").strip()
+        print(file_name)
         image = Image.open(file_name).convert("RGBA")
         break
     except FileNotFoundError:
-        print("File not found. Try again.")
+        print("File not found")
 
-font = ImageFont.truetype("arial.ttf", 20)
+font = ImageFont.truetype("/System/Library/Fonts/Supplemental/Arial.ttf", 20)
 width, height = image.size
 print("Original size:", width, height)
 new_width = int(SCALE_FACTOR * width)
@@ -44,4 +47,4 @@ with open("output.txt", "w") as text_file:
         text_file.write("\n")
 
 output_image.save("output.png")
-print("Converted")
+
