@@ -1,1 +1,20 @@
+# Python virtual environment - never commit installed packages
+.venv/
+venv/
+env/
+
+# Byte-compiled files
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment variables / secrets
 .env
+
+# Generated / downloaded media - regenerate locally instead of committing
+Video_Downloaded/
+Ascii_Photo/output.png
+
+# Editor/OS
+.DS_Store
+.vscode/
