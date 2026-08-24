@@ -8,7 +8,7 @@ WINDOW_HEIGHT = 700
 FONT_SIZE = 12
 BACKGROUND_COLOR = (20, 20, 20)
 
-CHARS = "@%#*+=-:. "
+CHARS = " tfjrxnukhao*#MW&8%B@$"
 
 video_path = input("Enter the path to your video file: ").strip()
 cap = cv2.VideoCapture(video_path)
